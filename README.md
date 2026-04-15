@@ -1,17 +1,16 @@
 # react-clean-skills
 
-Claude Code plugin marketplace for building React + Next.js apps with hybrid Clean Architecture, Mantine UI, and TanStack Query.
+Portable Claude Code and Codex plugin marketplace for applying the `fullstack-ai-template` architecture profile: strict Clean Architecture boundaries plus `composeHooks` Smart/Dumb React components.
 
-## Plugins
+## Plugin
 
-| Plugin              | Purpose                                                                                                    |
-| ------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `architector`       | Design & implement features across Clean Architecture layers (Domain → Use-Cases → Adapters → UI).         |
-| `component-creator` | Create React components with `composeHooks` Smart/Dumb separation, translations, and a standard file layout. UI library is project-defined. |
+| Plugin                | Skills                               | Purpose                                                                                             |
+| --------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `react-clean-skills`  | `architector`, `component-creator`   | Design feature slices and create React components using the strict Fullstack AI Template profile. |
 
-Both are model-invoked: Claude picks them automatically when a task matches their descriptions.
+Both skills are model-invoked: Claude Code and Codex can select them automatically when a task matches the skill frontmatter `description`.
 
-## Install
+## Claude Code Install
 
 ### Option A — committed in your repo (recommended for teams)
 
@@ -25,8 +24,7 @@ Add to `.claude/settings.json`:
     }
   },
   "enabledPlugins": {
-    "architector@react-clean-skills": true,
-    "component-creator@react-clean-skills": true
+    "react-clean-skills@react-clean-skills": true
   }
 }
 ```
@@ -37,19 +35,17 @@ When a teammate trusts the repo folder, Claude Code prompts them to install the 
 
 ```shell
 /plugin marketplace add clicktronix/react-clean-skills
-/plugin install architector@react-clean-skills
-/plugin install component-creator@react-clean-skills
+/plugin install react-clean-skills@react-clean-skills
 ```
 
 ### Option C — CLI, per-user
 
 ```bash
 claude plugin marketplace add clicktronix/react-clean-skills
-claude plugin install architector@react-clean-skills --scope user
-claude plugin install component-creator@react-clean-skills --scope user
+claude plugin install react-clean-skills@react-clean-skills --scope user
 ```
 
-## Using the skills
+### Claude Code Usage
 
 After install, run `/reload-plugins`. Invoke via:
 
@@ -60,21 +56,33 @@ After install, run `/reload-plugins`. Invoke via:
 
 Or just describe a task — Claude picks the right skill based on its frontmatter `description`.
 
-## Assumptions
+## Codex Install
 
-**Required** (skill patterns depend on these):
+This repository also contains a Codex marketplace at `.agents/plugins/marketplace.json` and a Codex plugin manifest at `plugins/react-clean-skills/.codex-plugin/plugin.json`.
 
-- **Framework**: Next.js (App Router), React 19, TypeScript
-- **Architecture**: hybrid Clean Architecture with `domain/`, `use-cases/`, `adapters/inbound/next/`, `adapters/outbound/`, `ui/`
-- **Component pattern**: Smart/Dumb separation via `composeHooks(View)(useProps)`
+When this marketplace is available to Codex, install the `react-clean-skills` plugin from `/plugins`. The installed plugin exposes:
 
-**Illustrative** (shown in examples — swap for your stack):
+```text
+$architector
+$component-creator
+```
 
-- **UI library**: Mantine — works equally with Chakra, shadcn/ui, Radix, Tailwind, or plain elements
-- **Validation**: Valibot — Zod / Yup / Arktype fit the same domain role
-- **Backend**: Supabase — Prisma / Drizzle / REST / gRPC fit the same outbound role
-- **Server state**: TanStack Query — SWR / RTK Query work too
-- **i18n**: any library with a message/format primitive
+You can also let Codex select the matching skill from the task description, or use `@react-clean-skills` when choosing the plugin in the composer.
+
+## Architecture Profile
+
+The skills are portable, but they are not generic prompts. They default to the rules from `clicktronix/fullstack-ai-template` and adapt only where the target repository has explicit equivalent conventions.
+
+Default profile:
+
+- **Framework**: Next.js App Router, React, TypeScript
+- **Architecture**: `domain -> use-cases -> adapters -> ui/server-state -> ui/app` boundaries from the template docs
+- **Validation**: Valibot schemas with inferred types
+- **Backend role**: Supabase outbound adapters, replaceable only by a repository/gateway equivalent
+- **Server state**: TanStack Query in `src/ui/server-state/<feature>/`
+- **UI**: Mantine + CSS Modules
+- **i18n**: `messages.json` + `TranslationText`
+- **Component pattern**: `composeHooks(View)(useProps)` for any component with logic
 
 A reference template applying these conventions with Mantine + Supabase + Valibot: [clicktronix/fullstack-ai-template](https://github.com/clicktronix/fullstack-ai-template).
 
@@ -86,7 +94,14 @@ Run `claude plugin update` to pull the latest after a release.
 
 ## Contributing
 
-Edit `plugins/<name>/skills/<name>/SKILL.md`. Bump the plugin `version` in `plugins/<name>/.claude-plugin/plugin.json` and the matching entry in `.claude-plugin/marketplace.json`. Open a PR.
+Edit `plugins/react-clean-skills/skills/<name>/SKILL.md`. Bump the plugin `version` in:
+
+- `plugins/react-clean-skills/.claude-plugin/plugin.json`
+- `plugins/react-clean-skills/.codex-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
+- `.agents/plugins/marketplace.json`
+
+Open a PR.
 
 ## License
 
