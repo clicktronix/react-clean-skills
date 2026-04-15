@@ -1,0 +1,11 @@
+{
+  "name": "architector",
+  "description": "Design and implement features using hybrid Clean Architecture for full-stack Next.js apps. Guides layer boundaries, ports/adapters, and feature wiring.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Clicktronix",
+    "url": "https://github.com/clicktronix"
+  },
+  "homepage": "https://github.com/clicktronix/react-clean-skills",
+  "license": "MIT"
+}

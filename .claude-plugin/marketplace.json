@@ -1,0 +1,24 @@
+{
+  "name": "react-clean-skills",
+  "owner": {
+    "name": "Clicktronix",
+    "url": "https://github.com/clicktronix"
+  },
+  "metadata": {
+    "description": "Claude Code skills for building React + Next.js apps with hybrid Clean Architecture, Mantine UI, and TanStack Query.",
+    "version": "0.1.0"
+  },
+  "pluginRoot": "./plugins",
+  "plugins": [
+    {
+      "name": "architector",
+      "description": "Design and implement features using hybrid Clean Architecture. Domain → Use-Cases → Adapters → UI with Valibot schemas and TanStack Query.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "component-creator",
+      "description": "Create React components following Smart/Dumb separation via composeHooks. Enforces Mantine UI, i18n, and the View + lib.ts + interfaces.ts + messages.json + styles.module.css file layout.",
+      "version": "0.1.0"
+    }
+  ]
+}
