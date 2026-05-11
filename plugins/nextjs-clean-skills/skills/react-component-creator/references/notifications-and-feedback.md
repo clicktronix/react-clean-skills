@@ -1,0 +1,46 @@
+# Notifications And Feedback
+
+**Impact: MEDIUM**
+
+Scattered `notifications.show({ color: 'red', icon: ..., title: ..., message: ... })` calls drift in copy, color, and icon. Centralize feedback behind small helpers and a single confirm hook.
+
+## Semantic Notify Helpers
+
+Expose `notifyError`, `notifySuccess`, `notifyInfo`, `notifyWarning` in a feature-agnostic module. Each helper accepts `intl`, a title descriptor or string, an optional message, and an optional `values` map. Each applies semantic defaults: color, icon, and `autoClose` duration (errors stay longer than confirmations).
+
+Colors are semantic theme tokens (`success`, `warning`, `info`, `danger`) registered in the Mantine theme, never hex literals.
+
+```ts
+notifyError({ intl, title: msg.saveFailed, error })
+notifySuccess({ intl, title: msg.saved })
+```
+
+When `notifyError` is called with an `error` but no `message`, it formats through the project's error mapping layer (`presentError(error)`) so the user-facing copy stays consistent with the inbound adapter's typed `ApiError` taxonomy.
+
+## Global Mutation Error Notifier
+
+Mutation `onError: notifyError(...)` handlers duplicate across hooks. Subscribe once to the TanStack mutation cache and route error events to `notifyError`, with an `opt-out flag` (`meta.silent`) for mutations that own their UX (inline form errors, optimistic rollback toasts).
+
+Local `onError` handlers stay only for rollback logic. Notification is the notifier's job.
+
+```ts
+queryClient.getMutationCache().subscribe((event) => {
+  if (event.type !== 'updated' || event.action.type !== 'error') return
+  if ((event.mutation.meta as { silent?: boolean })?.silent) return
+  notifyError({ intl, error: event.action.error })
+})
+```
+
+Mount the notifier inside the query provider so it sees every mutation in the app.
+
+## Unified Confirm Hook
+
+Replace ad-hoc `useConfirmAction`, `useConfirmDelete`, and inline `modals.openConfirmModal` calls with one `useConfirm` hook that takes a `kind: 'action' | 'delete' | 'destructive'` discriminator. The hook applies the right color (info or danger), the right default copy, and the right confirm-button label per kind.
+
+Callers stay short:
+
+```ts
+confirm({ kind: 'delete', title: msg.deleteTitle, message: msg.deleteMessage, onConfirm })
+```
+
+Reference: project notification and confirm conventions.

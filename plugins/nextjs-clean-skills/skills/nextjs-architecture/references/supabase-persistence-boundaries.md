@@ -29,4 +29,27 @@ RLS guardrails:
 
 For exact SQL syntax and performance details, fetch current Supabase docs. The architectural rule is stable: Supabase is an outbound implementation detail.
 
+## Bulk Writes Via RPC
+
+Replace `Promise.all(N × update())` with a single `SECURITY INVOKER` RPC that takes `jsonb` and unpacks via `jsonb_to_recordset`. One round-trip, atomic, RLS still applied.
+
+```sql
+CREATE FUNCTION public.reorder_in_column(updates jsonb) RETURNS SETOF campaigns
+LANGUAGE sql SECURITY INVOKER SET search_path = public AS $$
+  UPDATE public.campaigns c SET column_id = u.column_id, position = u.position
+  FROM jsonb_to_recordset(updates) AS u(id uuid, column_id uuid, position int)
+  WHERE c.id = u.id RETURNING c.*;
+$$;
+```
+
+The adapter calls `client.rpc('reorder_in_column', { updates })` and parses the rows through the domain schema.
+
+## Error Mapping
+
+Adapters must not `throw new Error(error.message)` from Postgres or PostgREST errors. Raw messages, details, and hints leak schema and end up in user-facing toasts. Map known Postgres SQLSTATE codes and PostgREST/API codes to typed `ApiError` subclasses: `42501` -> `ForbiddenError`, `23505` -> `ConflictError`, `23502` -> `ValidationError`, `PGRST116` -> `NotFoundError` for expected single-row misses. Put the raw payload into an `extra`/`responseBody` field for server logs only.
+
+## Explicit Column Selection
+
+Avoid `select('*')` on hot read paths. Migrations add or remove columns silently, network bandwidth is wasted, and internal flags leak. Maintain a per-entity column constant and select it explicitly; the same constant is used by `.select('...')` and by the row mapper, so adding a column is one diff.
+
 Reference: Supabase as outbound adapter plus RLS as database-side authority.

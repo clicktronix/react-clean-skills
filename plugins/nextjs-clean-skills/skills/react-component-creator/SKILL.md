@@ -44,6 +44,7 @@ Do not put server data in `useState`, Context, or any client store. Do not use T
 - [Forms And Actions](references/forms-and-actions.md)
 - [State Placement](references/state-placement.md)
 - [Styling And i18n](references/styling-and-i18n.md)
+- [Notifications And Feedback](references/notifications-and-feedback.md)
 
 ## Workflow
 
