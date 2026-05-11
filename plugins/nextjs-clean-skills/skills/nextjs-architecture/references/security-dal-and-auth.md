@@ -34,4 +34,19 @@ export async function getCurrentProfile() {
 
 For exact Supabase SSR token refresh or Next.js `server-only` syntax, fetch current docs. The architectural rule is stable: auth is rechecked at the data boundary.
 
+## Input Parsing And Length Caps
+
+Inbound adapters parse every payload through a domain schema after the auth wrapper. TypeScript action argument types are not a runtime barrier — bytes arrive as `unknown`. Cap every user-supplied array and free-form string at the schema level; downstream proxy limits must not be relied on. Suggested ceilings: customer reads ~100; admin reads ~1000; bulk writes ~500; free-form text 4k–8k chars by field purpose.
+
+## Defense-In-Depth Ownership Filter
+
+RLS is the database-side authority. Outbound adapters still add an explicit ownership predicate on user-scoped writes, so a regressed policy or a service-role client cannot silently escalate.
+
+```ts
+await client.from('campaigns')
+  .update(patch).eq('id', id).eq('created_by', userId)
+```
+
+For child rows, scope by the parent the caller controls (`.eq('campaign_id', scope.campaignId)`).
+
 Reference: Next.js DAL authentication pattern; Supabase SSR auth guidance.

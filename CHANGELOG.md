@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-11
+
+### Added
+
+- Added RSC + DAL hybrid read pattern with `initialData` + `initialDataUpdatedAt: 0` to `data-ownership-cache-tanstack.md`.
+- Added input parsing/length caps and defense-in-depth ownership filter sections to `security-dal-and-auth.md`.
+- Added bulk-write RPC (`jsonb_to_recordset`), Postgres error → typed `ApiError` mapping, and explicit-column selection sections to `supabase-persistence-boundaries.md`.
+- Added new reference `observability-and-sentry.md` (lazy SDK loader, PII redaction, user context without email, route handler capture).
+- Added compound-provider split pattern to `component-structure-composehooks.md`.
+- Added explicit variants vs mode-discriminator pattern to `state-placement.md`.
+- Added localized Standard Schema → Mantine validator bridge section to `forms-and-actions.md`.
+- Added new reference `notifications-and-feedback.md` (semantic `notify*` helpers, global mutation error notifier, unified `useConfirm` hook).
+
 ## [1.1.0] - 2026-05-03
 
 ### Added

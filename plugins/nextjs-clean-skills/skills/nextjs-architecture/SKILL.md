@@ -71,6 +71,7 @@ Data and persistence:
 Quality:
 
 - [Testing By Layer](references/testing-by-layer.md)
+- [Observability And Sentry](references/observability-and-sentry.md)
 
 ## Final Checklist
 
