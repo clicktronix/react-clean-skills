@@ -2,7 +2,12 @@
 
 **Impact: HIGH**
 
-Error reporting belongs in infrastructure, not in domain or use-case code. Use a thin server-only helper and call it from inbound adapters, route handlers, and client error boundaries.
+Error reporting belongs in infrastructure, not in domain or use-case code. Split helpers by runtime:
+
+- server runtime: server-only lazy loader for inbound adapters, route handlers, and Server Actions.
+- client runtime: client-safe wrapper for Error Boundaries and UI events.
+
+Do not import a server-only helper into a Client Component or client error boundary.
 
 ## Lazy Loader
 
@@ -30,7 +35,7 @@ Apply the same redaction to client-side `Replay` events if Replay is enabled; ot
 
 ## Route Handler Capture
 
-Wrap every `app/**/route.ts` and Server Action entry in try/catch. Forward the error to Sentry with `tags: { route, method }`, then return a generic public-safe response. Do not echo `error.message`, stack frames, or DB hints to the client.
+Capture unexpected errors once at the inbound boundary. Route handlers return generic public-safe responses; Server Actions use a shared safe-action wrapper or `handleActionError`. Do not wrap every nested function manually or duplicate-capture the same exception.
 
 ```ts
 try { return await handler(req) }
@@ -40,6 +45,6 @@ catch (error) {
 }
 ```
 
-Use-cases throw typed `ApiError`s; inbound adapters decide which become user-visible status codes and which become 500 + Sentry events.
+Use-cases throw typed `ApiError`s; inbound adapters decide which become user-visible status codes and which become 500 + Sentry events. Do not echo `error.message`, stack frames, or DB hints to the client.
 
 Reference: project observability boundary; Sentry SDK lazy + privacy posture.

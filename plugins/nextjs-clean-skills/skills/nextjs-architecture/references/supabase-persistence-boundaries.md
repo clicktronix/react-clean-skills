@@ -46,7 +46,7 @@ The adapter calls `client.rpc('reorder_in_column', { updates })` and parses the 
 
 ## Error Mapping
 
-Adapters must not `throw new Error(error.message)` from Postgres errors. Raw messages, details, and hints leak schema and end up in user-facing toasts. Map known Postgres SQLSTATE codes to typed `ApiError` subclasses (`ForbiddenError` for `42501`, `ConflictError` for `23505`, `NotFoundError` for `PGRST116`, `ValidationError` for `23502`, etc.). Put the raw payload into an `extra`/`responseBody` field for server logs only.
+Adapters must not `throw new Error(error.message)` from Postgres or PostgREST errors. Raw messages, details, and hints leak schema and end up in user-facing toasts. Map known Postgres SQLSTATE codes and PostgREST/API codes to typed `ApiError` subclasses: `42501` -> `ForbiddenError`, `23505` -> `ConflictError`, `23502` -> `ValidationError`, `PGRST116` -> `NotFoundError` for expected single-row misses. Put the raw payload into an `extra`/`responseBody` field for server logs only.
 
 ## Explicit Column Selection
 

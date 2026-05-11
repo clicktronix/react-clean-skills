@@ -28,7 +28,7 @@ For reference data that needs synchronous first paint **and** client-side optimi
 
 1. Server DAL fetches with `'use cache'` + `cacheTag(...)` and returns serializable rows.
 2. RSC passes rows as `initialData` props to a Client island.
-3. Client `useQuery` is keyed by feature and receives `initialData` plus `initialDataUpdatedAt: 0`.
+3. Client `useQuery` is keyed by feature and receives `initialData` plus an explicit freshness decision.
 4. Mutations call a Server Action that runs the use-case and then `revalidateTag(tag, 'max')`.
 
 ```ts
@@ -36,10 +36,12 @@ useQuery({
   queryKey: keys.list(),
   queryFn: getListAction,
   initialData,
-  initialDataUpdatedAt: initialData ? 0 : undefined,
+  initialDataUpdatedAt: initialData ? serverFetchedAt : undefined,
 })
 ```
 
-`initialDataUpdatedAt: 0` marks seeded data as immediately stale so the client refetches after a `revalidateTag` mutation. Without it, TanStack treats `initialData` as fresh and never sees the new server cache. Do not apply this hybrid to interactive search/filter lists (pure TanStack) or to mostly-static pages without writes (pure RSC props).
+Use `initialDataUpdatedAt: serverFetchedAt` when the server timestamp is known. Use `initialDataUpdatedAt: 0` only when the seed is intentionally "render now, refetch immediately". If one query is consumed by multiple islands or TanStack should own freshness, prefer `prefetchQuery` + `HydrationBoundary` instead of hand-passing `initialData`.
+
+Do not apply this hybrid to interactive search/filter lists (pure TanStack) or to mostly-static pages without writes (pure RSC props).
 
 Reference: Next.js RSC/cache ownership; TanStack Query client async lifecycle.

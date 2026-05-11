@@ -16,6 +16,8 @@ Choose the layer before writing files. Dependency direction is compile-time, not
 
 Runtime can flow downward from UI to inbound to use-case to outbound. Imports do not mirror every runtime call: use-cases depend on ports, not concrete adapters.
 
+Avoid a generic `src/lib/**` dumping ground. Put helpers in the layer that owns the reason for change: `infrastructure` for env/auth/logging/cache/persistence support, `ui` for browser/UI bridges, `domain` for pure business helpers, and `adapters` for transport or persistence helpers. If a repo keeps legacy `lib`, treat it as a migration bucket, not a place for new architecture.
+
 **Incorrect (use-case imports concrete persistence):**
 
 ```ts
