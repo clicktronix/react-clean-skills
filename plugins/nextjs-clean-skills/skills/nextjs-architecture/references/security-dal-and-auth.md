@@ -13,6 +13,7 @@ Security boundary rules:
 - never trust hidden fields, bound args, disabled buttons, or client validation for authority.
 - service-role clients and secrets live in server-only infrastructure/outbound modules.
 - Supabase SSR: never trust `getSession()` for server auth; follow current docs for `getClaims()` vs `getUser()` before changing proxy/session refresh code.
+- post-login/callback redirects accept only same-origin paths from a shared helper. Reject `//`, `\`/`%5C`, control chars, and auth-loop targets.
 
 **Incorrect (route protection plus raw row exposure):**
 
